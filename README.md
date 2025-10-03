@@ -194,9 +194,9 @@ ADOBE_CLIENT_ID=your_adobe_client_id
 ADOBE_CLIENT_SECRET=your_adobe_client_secret
 
 # Optional: Stack Auth (for future user authentication)
-STACK_SECRET_SERVER_KEY=your_stack_key
-NEXT_PUBLIC_STACK_PROJECT_ID=your_project_id
-NEXT_PUBLIC_STACK_PUBLISHABLE_CLIENT_KEY=your_publishable_key
+STACK_SECRET_SERVER_KEY=your_stack_secret_key
+NEXT_PUBLIC_STACK_PROJECT_ID=your_stack_project_id
+NEXT_PUBLIC_STACK_PUBLISHABLE_KEY=your_stack_publishable_key
 \`\`\`
 
 ### 4. Run Development Server

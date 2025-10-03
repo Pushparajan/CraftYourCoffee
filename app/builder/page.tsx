@@ -15,6 +15,7 @@ import { ToppingStep } from "@/components/builder/topping-step"
 import { TemperatureStep } from "@/components/builder/temperature-step"
 import { FinalizeStep } from "@/components/builder/finalize-step"
 import { DrinkPreview } from "@/components/builder/drink-preview"
+import { PriceCalculator } from "@/components/builder/price-calculator"
 
 export type DrinkConfig = {
   base?: string
@@ -45,7 +46,7 @@ export default function BuilderPage() {
     syrups: [],
     toppings: [],
     sweetness: "medium",
-    ice: "regular",
+    ice: "none",
     name: "",
   })
   const [generatedImageUrl, setGeneratedImageUrl] = useState<string | null>(null)
@@ -111,8 +112,13 @@ export default function BuilderPage() {
             <img src="/logo.png" alt="CraftYourCoffee Logo" className="h-8 w-8" />
             <h1 className="text-2xl font-bold text-brand-text">CraftYourCoffee</h1>
           </Link>
-          <div className="text-sm text-brand-text-muted">
-            Step {currentStep} of {steps.length}
+          <div className="flex items-center gap-6">
+            <Link href="/custom-prompt" className="text-sm font-semibold text-brand-text hover:text-brand-primary">
+              Test Prompts
+            </Link>
+            <div className="text-sm text-brand-text-muted">
+              Step {currentStep} of {steps.length}
+            </div>
           </div>
         </div>
       </header>
@@ -168,8 +174,9 @@ export default function BuilderPage() {
           </div>
 
           {/* Preview Panel */}
-          <div className="lg:col-span-1">
+          <div className="lg:col-span-1 lg:sticky lg:top-24 lg:self-start space-y-4">
             <DrinkPreview config={drinkConfig} onImageGenerated={setGeneratedImageUrl} />
+            <PriceCalculator config={drinkConfig} />
           </div>
         </div>
       </div>

@@ -4,61 +4,98 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  /* Updated to custom coffee-themed color palette with green background */
-  /* Terracotta: #9e6f5c, Forest Green: #3d5a40, Tan: #a1916a, Light Tan: #d4a373, Light Gray: #e8e8e8, Charcoal: #3e3e3e */
-  /* Updated background to forest green and adjusted all colors for proper contrast */
-  --background: oklch(0.38 0.06 155);
-  --foreground: oklch(0.98 0.005 60);
-  --card: oklch(0.42 0.06 155);
-  --card-foreground: oklch(0.98 0.005 60);
-  --popover: oklch(0.42 0.06 155);
-  --popover-foreground: oklch(0.98 0.005 60);
-  --primary: oklch(0.72 0.04 45);
-  --primary-foreground: oklch(0.28 0.01 60);
-  --secondary: oklch(0.55 0.06 40);
-  --secondary-foreground: oklch(0.98 0.005 60);
-  --muted: oklch(0.45 0.05 155);
-  --muted-foreground: oklch(0.85 0.01 60);
-  --accent: oklch(0.55 0.06 40);
-  --accent-foreground: oklch(0.98 0.005 60);
+  /* Updated to official Starbucks design system colors */
+  /* Starbucks Green: #00704A (primary brand), Dark Green: #1E3932, Cream: #F7F7F7, Black: #000000 */
+
+  /* Core Starbucks brand colors */
+  --starbucks-green: oklch(0.45 0.12 165);
+  --starbucks-dark-green: oklch(0.25 0.08 165);
+  --starbucks-cream: oklch(0.97 0.005 60);
+  --starbucks-black: oklch(0.15 0 0);
+  --starbucks-white: oklch(0.99 0 0);
+
+  /* Semantic design tokens based on Starbucks design system */
+  --background: var(--starbucks-cream);
+  --foreground: var(--starbucks-black);
+
+  --card: var(--starbucks-white);
+  --card-foreground: var(--starbucks-black);
+
+  --popover: var(--starbucks-white);
+  --popover-foreground: var(--starbucks-black);
+
+  --primary: var(--starbucks-green);
+  --primary-foreground: var(--starbucks-white);
+
+  --secondary: var(--starbucks-dark-green);
+  --secondary-foreground: var(--starbucks-white);
+
+  --muted: oklch(0.92 0.005 60);
+  --muted-foreground: oklch(0.45 0.01 60);
+
+  --accent: var(--starbucks-green);
+  --accent-foreground: var(--starbucks-white);
+
   --destructive: oklch(0.577 0.245 27.325);
-  --destructive-foreground: oklch(0.99 0 0);
-  --border: oklch(0.5 0.05 155);
-  --input: oklch(0.45 0.05 155);
-  --ring: oklch(0.72 0.04 45);
-  --chart-1: oklch(0.72 0.04 45);
-  --chart-2: oklch(0.55 0.06 40);
-  --chart-3: oklch(0.62 0.04 55);
-  --chart-4: oklch(0.85 0.01 60);
-  --chart-5: oklch(0.5 0.05 150);
-  --radius: 0.5rem;
-  --sidebar: oklch(0.42 0.06 155);
-  --sidebar-foreground: oklch(0.98 0.005 60);
-  --sidebar-primary: oklch(0.72 0.04 45);
-  --sidebar-primary-foreground: oklch(0.28 0.01 60);
-  --sidebar-accent: oklch(0.45 0.05 155);
-  --sidebar-accent-foreground: oklch(0.98 0.005 60);
-  --sidebar-border: oklch(0.5 0.05 155);
-  --sidebar-ring: oklch(0.72 0.04 45);
-  /* Added semantic tokens for app-specific colors */
-  --page-background: oklch(0.96 0.02 45);
-  --page-background-secondary: oklch(0.94 0.03 50);
-  --brand-primary: oklch(0.55 0.06 40);
-  --brand-primary-hover: oklch(0.48 0.06 40);
-  --brand-text: oklch(0.35 0.05 40);
-  --brand-text-muted: oklch(0.45 0.05 40);
-  --button-primary: oklch(0.72 0.04 45);
-  --button-border: oklch(0.62 0.04 45);
-  --success: oklch(0.5 0.1 150);
-  --success-foreground: oklch(0.98 0.005 60);
+  --destructive-foreground: var(--starbucks-white);
+
+  --border: oklch(0.85 0.005 60);
+  --input: oklch(0.88 0.005 60);
+  --ring: var(--starbucks-green);
+
+  /* Chart colors using Starbucks palette */
+  --chart-1: var(--starbucks-green);
+  --chart-2: var(--starbucks-dark-green);
+  --chart-3: oklch(0.65 0.08 165);
+  --chart-4: oklch(0.75 0.06 165);
+  --chart-5: oklch(0.55 0.1 165);
+
+  /* Updated border radius to match Starbucks rounded corners (8-12px) */
+  --radius: 0.75rem;
+
+  /* Sidebar colors */
+  --sidebar: var(--starbucks-white);
+  --sidebar-foreground: var(--starbucks-black);
+  --sidebar-primary: var(--starbucks-green);
+  --sidebar-primary-foreground: var(--starbucks-white);
+  --sidebar-accent: var(--starbucks-cream);
+  --sidebar-accent-foreground: var(--starbucks-black);
+  --sidebar-border: var(--border);
+  --sidebar-ring: var(--starbucks-green);
+
+  /* App-specific tokens aligned with Starbucks design */
+  --page-background: var(--starbucks-cream);
+  --page-background-secondary: var(--starbucks-white);
+
+  --brand-primary: var(--starbucks-green);
+  --brand-primary-hover: oklch(0.4 0.12 165);
+  --brand-secondary: var(--starbucks-dark-green);
+
+  --brand-text: var(--starbucks-black);
+  --brand-text-muted: oklch(0.45 0.01 60);
+
+  /* Button colors - Starbucks uses outlined buttons for secondary actions */
+  --button-primary: var(--starbucks-black);
+  --button-primary-hover: oklch(0.25 0 0);
+  --button-secondary: transparent;
+  --button-border: var(--starbucks-black);
+
+  /* Selection colors for drink builder */
+  --selection-bg: oklch(0.85 0.02 45);
+  --selection-border: var(--starbucks-green);
+  --selection-text: var(--starbucks-black);
+
+  /* Success and seasonal colors */
+  --success: oklch(0.5 0.12 165);
+  --success-foreground: var(--starbucks-white);
   --seasonal: oklch(0.65 0.08 50);
-  --seasonal-foreground: oklch(0.35 0.06 50);
+  --seasonal-foreground: var(--starbucks-black);
 }
 
 @theme inline {
-  /* Added Starbucks-inspired font stack */
-  --font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial,
-    sans-serif;
+  /* Updated font stack to match Starbucks typography (SoDo Sans family) */
+  --font-sans: "SoDo Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -83,10 +120,13 @@
   --color-chart-3: var(--chart-3);
   --color-chart-4: var(--chart-4);
   --color-chart-5: var(--chart-5);
+
+  /* Updated radius values for Starbucks rounded corners */
   --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
+  --radius-md: var(--radius);
+  --radius-lg: calc(var(--radius) + 4px);
+  --radius-xl: calc(var(--radius) + 8px);
+
   --color-sidebar: var(--sidebar);
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar-primary: var(--sidebar-primary);
@@ -95,15 +135,21 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
-  /* Added app-specific color tokens to theme */
+
   --color-page-background: var(--page-background);
   --color-page-background-secondary: var(--page-background-secondary);
   --color-brand-primary: var(--brand-primary);
   --color-brand-primary-hover: var(--brand-primary-hover);
+  --color-brand-secondary: var(--brand-secondary);
   --color-brand-text: var(--brand-text);
   --color-brand-text-muted: var(--brand-text-muted);
   --color-button-primary: var(--button-primary);
+  --color-button-primary-hover: var(--button-primary-hover);
+  --color-button-secondary: var(--button-secondary);
   --color-button-border: var(--button-border);
+  --color-selection-bg: var(--selection-bg);
+  --color-selection-border: var(--selection-border);
+  --color-selection-text: var(--selection-text);
   --color-success: var(--success);
   --color-success-foreground: var(--success-foreground);
   --color-seasonal: var(--seasonal);

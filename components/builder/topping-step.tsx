@@ -69,8 +69,8 @@ export function ToppingStep({
               onClick={() => toggleTopping(topping.name)}
             >
               {isSelected && (
-                <div className="absolute top-2 right-2 bg-button-border rounded-full p-1">
-                  <Check className="h-3 w-3 text-foreground" />
+                <div className="absolute top-2 right-2 bg-white rounded-full p-1">
+                  <Check className="h-3 w-3 text-button-primary" />
                 </div>
               )}
               <h3 className="font-semibold text-sm mb-1 text-primary-foreground">{topping.name}</h3>

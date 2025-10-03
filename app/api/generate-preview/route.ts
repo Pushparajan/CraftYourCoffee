@@ -1,18 +1,25 @@
 import { NextResponse } from "next/server"
-import { generateDrinkImage, buildDrinkPrompt } from "@/lib/adobe-firefly"
+import { generateDrinkImage, buildDrinkPrompt, compositeLogoOnImage } from "@/lib/adobe-firefly"
 
 export async function POST(request: Request) {
   try {
     const config = await request.json()
 
-    // Build the prompt from the drink configuration
-    const prompt = buildDrinkPrompt(config)
+    const { prompt, negativePrompt } = buildDrinkPrompt(config)
     console.log("[v0] Generated prompt:", prompt)
+    console.log("[v0] Generated negative prompt:", negativePrompt)
 
-    // Generate the image using Adobe Firefly
-    const imageUrl = await generateDrinkImage(prompt)
+    const baseImageUrl = await generateDrinkImage(prompt, negativePrompt)
+    console.log("[v0] Base image generated:", baseImageUrl)
 
-    return NextResponse.json({ imageUrl, prompt })
+    const finalImageUrl = await compositeLogoOnImage(baseImageUrl)
+    console.log("[v0] Final composited image:", finalImageUrl)
+
+    return NextResponse.json({
+      imageUrl: finalImageUrl,
+      prompt,
+      negativePrompt,
+    })
   } catch (error) {
     console.error("[v0] Error generating preview:", error)
     const errorMessage = error instanceof Error ? error.message : "Failed to generate preview image"

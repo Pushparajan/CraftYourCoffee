@@ -5,7 +5,8 @@ import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Coffee, Heart, Download, Copy, RotateCcw, Check } from "lucide-react"
+import { Separator } from "@/components/ui/separator"
+import { Coffee, Heart, Download, Copy, RotateCcw, Check, DollarSign, Award } from "lucide-react"
 
 export default function SummaryPage() {
   const router = useRouter()
@@ -13,6 +14,7 @@ export default function SummaryPage() {
   const [imageUrl, setImageUrl] = useState<string | null>(null)
   const [saved, setSaved] = useState(false)
   const [copied, setCopied] = useState(false)
+  const [priceBreakdown, setPriceBreakdown] = useState<any>(null)
 
   useEffect(() => {
     // In a real app, this would come from state management or URL params
@@ -22,11 +24,31 @@ export default function SummaryPage() {
 
     if (savedConfig) {
       setDrinkConfig(JSON.parse(savedConfig))
+      calculatePrice(JSON.parse(savedConfig))
     }
     if (savedImage) {
       setImageUrl(savedImage)
     }
   }, [])
+
+  const calculatePrice = async (config: any) => {
+    try {
+      const response = await fetch("/api/calculate-price", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(config),
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        setPriceBreakdown(data)
+      }
+    } catch (error) {
+      console.error("[v0] Error calculating price:", error)
+    }
+  }
 
   const handleSave = async () => {
     if (!drinkConfig) return
@@ -71,13 +93,28 @@ Ice: ${drinkConfig.ice}`
     setTimeout(() => setCopied(false), 2000)
   }
 
-  const handleDownload = () => {
+  const handleDownload = async () => {
     if (!imageUrl) return
 
-    const link = document.createElement("a")
-    link.href = imageUrl
-    link.download = `${drinkConfig?.name || "drink"}.jpg`
-    link.click()
+    try {
+      const response = await fetch(imageUrl)
+      const blob = await response.blob()
+      const blobUrl = URL.createObjectURL(blob)
+
+      const link = document.createElement("a")
+      link.href = blobUrl
+      link.download = `${drinkConfig?.name || "drink"}.jpg`
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+
+      // Clean up the blob URL
+      URL.revokeObjectURL(blobUrl)
+    } catch (error) {
+      console.error("[v0] Error downloading image:", error)
+      // Fallback: open in new tab if download fails
+      window.open(imageUrl, "_blank")
+    }
   }
 
   const handleRestart = () => {
@@ -218,6 +255,125 @@ Ice: ${drinkConfig.ice}`
                   </div>
                 </CardContent>
               </Card>
+
+              {priceBreakdown && (
+                <Card className="border-border bg-brand-primary/5">
+                  <CardHeader>
+                    <CardTitle className="text-xl text-brand-text flex items-center gap-2">
+                      <DollarSign className="h-5 w-5" />
+                      Order Summary
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="space-y-2 text-sm">
+                      {priceBreakdown.base > 0 && (
+                        <div className="flex justify-between">
+                          <span className="text-brand-text-muted">Base</span>
+                          <span className="text-brand-text">${priceBreakdown.base.toFixed(2)}</span>
+                        </div>
+                      )}
+                      {priceBreakdown.size > 0 && (
+                        <div className="flex justify-between">
+                          <span className="text-brand-text-muted">Size</span>
+                          <span className="text-brand-text">+${priceBreakdown.size.toFixed(2)}</span>
+                        </div>
+                      )}
+                      {priceBreakdown.milk > 0 && (
+                        <div className="flex justify-between">
+                          <span className="text-brand-text-muted">Milk</span>
+                          <span className="text-brand-text">+${priceBreakdown.milk.toFixed(2)}</span>
+                        </div>
+                      )}
+                      {priceBreakdown.syrups > 0 && (
+                        <div className="flex justify-between">
+                          <span className="text-brand-text-muted">Syrups</span>
+                          <span className="text-brand-text">+${priceBreakdown.syrups.toFixed(2)}</span>
+                        </div>
+                      )}
+                      {priceBreakdown.toppings > 0 && (
+                        <div className="flex justify-between">
+                          <span className="text-brand-text-muted">Toppings</span>
+                          <span className="text-brand-text">+${priceBreakdown.toppings.toFixed(2)}</span>
+                        </div>
+                      )}
+                    </div>
+
+                    <Separator className="bg-border" />
+
+                    <div className="flex justify-between items-center">
+                      <span className="text-brand-text font-bold text-lg">Total Price</span>
+                      <span className="text-brand-primary font-bold text-2xl">${priceBreakdown.total.toFixed(2)}</span>
+                    </div>
+
+                    {priceBreakdown.loyaltyPoints?.total > 0 && (
+                      <>
+                        <Separator className="bg-border my-4" />
+                        <div className="bg-brand-primary/10 rounded-lg p-4 space-y-3">
+                          <div className="flex items-center gap-2">
+                            <Award className="h-6 w-6 text-brand-primary" />
+                            <div>
+                              <p className="text-brand-text font-semibold">Loyalty Points Earned</p>
+                              <p className="text-xs text-brand-text-muted">2 points per dollar</p>
+                            </div>
+                          </div>
+
+                          <div className="space-y-1.5 text-sm">
+                            {priceBreakdown.loyaltyPoints.base > 0 && (
+                              <div className="flex justify-between">
+                                <span className="text-brand-text-muted">Base</span>
+                                <span className="text-brand-text font-medium">
+                                  {priceBreakdown.loyaltyPoints.base} pts
+                                </span>
+                              </div>
+                            )}
+                            {priceBreakdown.loyaltyPoints.size > 0 && (
+                              <div className="flex justify-between">
+                                <span className="text-brand-text-muted">Size</span>
+                                <span className="text-brand-text font-medium">
+                                  +{priceBreakdown.loyaltyPoints.size} pts
+                                </span>
+                              </div>
+                            )}
+                            {priceBreakdown.loyaltyPoints.milk > 0 && (
+                              <div className="flex justify-between">
+                                <span className="text-brand-text-muted">Milk</span>
+                                <span className="text-brand-text font-medium">
+                                  +{priceBreakdown.loyaltyPoints.milk} pts
+                                </span>
+                              </div>
+                            )}
+                            {priceBreakdown.loyaltyPoints.syrups > 0 && (
+                              <div className="flex justify-between">
+                                <span className="text-brand-text-muted">Syrups</span>
+                                <span className="text-brand-text font-medium">
+                                  +{priceBreakdown.loyaltyPoints.syrups} pts
+                                </span>
+                              </div>
+                            )}
+                            {priceBreakdown.loyaltyPoints.toppings > 0 && (
+                              <div className="flex justify-between">
+                                <span className="text-brand-text-muted">Toppings</span>
+                                <span className="text-brand-text font-medium">
+                                  +{priceBreakdown.loyaltyPoints.toppings} pts
+                                </span>
+                              </div>
+                            )}
+                          </div>
+
+                          <Separator className="bg-border/50" />
+
+                          <div className="flex items-center justify-between">
+                            <span className="text-brand-text font-bold">Total Points</span>
+                            <span className="text-brand-primary font-bold text-2xl">
+                              {priceBreakdown.loyaltyPoints.total}
+                            </span>
+                          </div>
+                        </div>
+                      </>
+                    )}
+                  </CardContent>
+                </Card>
+              )}
 
               {/* Actions */}
               <div className="space-y-3">

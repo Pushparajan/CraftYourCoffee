@@ -1,7 +1,6 @@
 "use client"
 
 import { useState } from "react"
-import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -16,6 +15,8 @@ export default function HomePage() {
 
   const handleStartCreating = () => {
     if (passcode === APP_CONFIG.PASSCODE) {
+      sessionStorage.setItem("isAuthenticated", "true")
+      window.dispatchEvent(new Event("auth-change"))
       router.push("/builder")
     } else {
       setError(true)
@@ -43,27 +44,6 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-page-background">
-      {/* Header */}
-      <header className="border-b border-border bg-page-background-secondary sticky top-0 z-50 shadow-sm">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <img src="/logo.png" alt="CraftYourCoffee Logo" className="h-10 w-10" />
-            <h1 className="text-2xl font-bold text-brand-text">CraftYourCoffee</h1>
-          </div>
-          <nav className="flex items-center gap-6">
-            <Link href="/" className="text-sm font-semibold text-brand-text hover:text-brand-primary">
-              Home
-            </Link>
-            <Link href="/favorites" className="text-sm font-semibold text-brand-text hover:text-brand-primary">
-              Favorites
-            </Link>
-            <Link href="/custom-prompt" className="text-sm font-semibold text-brand-text hover:text-brand-primary">
-              Test Prompts
-            </Link>
-          </nav>
-        </div>
-      </header>
-
       {/* Hero Section */}
       <section className="container mx-auto px-4 py-16 md:py-24">
         <div className="max-w-3xl mx-auto text-center">

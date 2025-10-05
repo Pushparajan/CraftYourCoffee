@@ -72,24 +72,6 @@ export default function FavoritesPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-page-background to-page-background-secondary">
-      {/* Header */}
-      <header className="border-b bg-foreground/80 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2">
-            <img src="/logo.png" alt="CraftYourCoffee Logo" className="h-8 w-8" />
-            <h1 className="text-2xl font-bold text-brand-text">CraftYourCoffee</h1>
-          </Link>
-          <nav className="flex items-center gap-6">
-            <Link href="/" className="text-sm font-medium text-brand-text hover:text-brand-primary-hover">
-              Home
-            </Link>
-            <Link href="/favorites" className="text-sm font-medium text-brand-text hover:text-brand-primary-hover">
-              Favorites
-            </Link>
-          </nav>
-        </div>
-      </header>
-
       {/* Main Content */}
       <div className="container mx-auto px-4 py-12">
         <div className="max-w-6xl mx-auto">

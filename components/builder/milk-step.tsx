@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react"
 import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import { Check } from "lucide-react"
 import type { DrinkConfig } from "@/app/builder/page"
 
 type Milk = {
@@ -40,28 +41,36 @@ export function MilkStep({
 
   return (
     <div className="space-y-4">
-      <p className="text-foreground mb-6">Choose your milk preference</p>
+      <p className="text-white mb-6">Choose your milk preference</p>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {milks.map((milk) => (
-          <Card
-            key={milk.id}
-            className={`p-6 cursor-pointer transition-all hover:shadow-md bg-button-primary ${
-              config.milk === milk.name
-                ? "border-[3px] border-button-border"
-                : "border border-button-primary hover:border-button-border"
-            }`}
-            onClick={() => updateConfig({ milk: milk.name })}
-          >
-            <div className="flex items-center justify-between">
-              <h3 className="font-semibold text-primary-foreground">{milk.name}</h3>
-              {milk.is_dairy_free && (
-                <Badge variant="secondary" className="bg-success/20 text-success-foreground border-success">
-                  Dairy Free
-                </Badge>
+        {milks.map((milk) => {
+          const isSelected = config.milk === milk.name
+          return (
+            <Card
+              key={milk.id}
+              className={`p-6 cursor-pointer transition-all hover:shadow-md bg-button-primary relative ${
+                isSelected
+                  ? "border-[3px] border-button-border"
+                  : "border border-button-primary hover:border-button-border"
+              }`}
+              onClick={() => updateConfig({ milk: milk.name })}
+            >
+              {isSelected && (
+                <div className="absolute top-3 right-3 w-6 h-6 rounded-full bg-white flex items-center justify-center">
+                  <Check className="h-4 w-4 text-button-primary" strokeWidth={3} />
+                </div>
               )}
-            </div>
-          </Card>
-        ))}
+              <div className="flex items-center justify-between">
+                <h3 className="font-semibold text-primary-foreground">{milk.name}</h3>
+                {milk.is_dairy_free && (
+                  <Badge variant="secondary" className="bg-success/20 text-success-foreground border-success">
+                    Dairy Free
+                  </Badge>
+                )}
+              </div>
+            </Card>
+          )
+        })}
       </div>
     </div>
   )

@@ -6,47 +6,75 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
-import { Coffee, Heart, Download, Copy, RotateCcw, Check, DollarSign, Award } from "lucide-react"
+import { Coffee, Heart, Download, Copy, RotateCcw, Check, DollarSign, Award, Sparkles, Loader2 } from "lucide-react"
 
-export default function SummaryPage() {
+export default function WizardPage() {
   const router = useRouter()
   const [drinkConfig, setDrinkConfig] = useState<any>(null)
   const [imageUrl, setImageUrl] = useState<string | null>(null)
   const [saved, setSaved] = useState(false)
   const [copied, setCopied] = useState(false)
   const [priceBreakdown, setPriceBreakdown] = useState<any>(null)
+  const [aiInsights, setAiInsights] = useState<any>(null)
+  const [isLoading, setIsLoading] = useState(true)
+  const [isGeneratingImage, setIsGeneratingImage] = useState(false)
 
   useEffect(() => {
-    // In a real app, this would come from state management or URL params
-    // For now, we'll use localStorage
-    const savedConfig = localStorage.getItem("currentDrink")
-    const savedImage = localStorage.getItem("currentDrinkImage")
-
-    if (savedConfig) {
-      setDrinkConfig(JSON.parse(savedConfig))
-      calculatePrice(JSON.parse(savedConfig))
-    }
-    if (savedImage) {
-      setImageUrl(savedImage)
-    }
+    generateAIRecommendation()
   }, [])
 
-  const calculatePrice = async (config: any) => {
+  const generateAIRecommendation = async () => {
+    setIsLoading(true)
     try {
-      const response = await fetch("/api/calculate-price", {
+      const response = await fetch("/api/wizard/generate", {
+        method: "POST",
+      })
+
+      if (!response.ok) {
+        const error = await response.json()
+        alert(error.error || "Failed to generate recommendation")
+        router.push("/admin")
+        return
+      }
+
+      const data = await response.json()
+      setDrinkConfig(data.drinkConfig)
+      setPriceBreakdown(data.pricing)
+      setAiInsights(data.aiInsights)
+
+      // Save to localStorage for potential navigation
+      localStorage.setItem("currentDrink", JSON.stringify(data.drinkConfig))
+    } catch (error) {
+      console.error("[v0] Error generating AI recommendation:", error)
+      alert("Failed to generate recommendation. Please try again.")
+      router.push("/admin")
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleGeneratePreview = async () => {
+    if (!drinkConfig) return
+
+    setIsGeneratingImage(true)
+    try {
+      const response = await fetch("/api/generate-preview", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(config),
+        body: JSON.stringify({ config: drinkConfig }),
       })
 
       if (response.ok) {
         const data = await response.json()
-        setPriceBreakdown(data)
+        setImageUrl(data.imageUrl)
+        localStorage.setItem("currentDrinkImage", data.imageUrl)
       }
     } catch (error) {
-      console.error("[v0] Error calculating price:", error)
+      console.error("[v0] Error generating preview:", error)
+    } finally {
+      setIsGeneratingImage(false)
     }
   }
 
@@ -60,7 +88,7 @@ export default function SummaryPage() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          name: drinkConfig.name || "My Custom Drink",
+          name: drinkConfig.name || "AI Crafted Coffee",
           config: drinkConfig,
           imageUrl: imageUrl,
         }),
@@ -78,7 +106,7 @@ export default function SummaryPage() {
   const handleCopy = () => {
     if (!drinkConfig) return
 
-    const text = `${drinkConfig.name || "My Custom Drink"}
+    const text = `${drinkConfig.name || "AI Crafted Coffee"}
 Base: ${drinkConfig.base}
 Size: ${drinkConfig.size}
 Milk: ${drinkConfig.milk}
@@ -103,33 +131,44 @@ Ice: ${drinkConfig.ice}`
 
       const link = document.createElement("a")
       link.href = blobUrl
-      link.download = `${drinkConfig?.name || "drink"}.jpg`
+      link.download = `${drinkConfig?.name || "ai-crafted-coffee"}.jpg`
       document.body.appendChild(link)
       link.click()
       document.body.removeChild(link)
 
-      // Clean up the blob URL
       URL.revokeObjectURL(blobUrl)
     } catch (error) {
       console.error("[v0] Error downloading image:", error)
-      // Fallback: open in new tab if download fails
       window.open(imageUrl, "_blank")
     }
   }
 
-  const handleRestart = () => {
-    localStorage.removeItem("currentDrink")
-    localStorage.removeItem("currentDrinkImage")
-    router.push("/builder")
+  const handleRegenerate = () => {
+    setImageUrl(null)
+    setDrinkConfig(null)
+    setPriceBreakdown(null)
+    setAiInsights(null)
+    generateAIRecommendation()
+  }
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-page-background to-page-background-secondary flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <Loader2 className="h-12 w-12 animate-spin text-brand-primary mx-auto" />
+          <p className="text-brand-text-muted">Crafting your perfect coffee with AI...</p>
+        </div>
+      </div>
+    )
   }
 
   if (!drinkConfig) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-page-background to-page-background-secondary flex items-center justify-center">
         <div className="text-center">
-          <p className="text-brand-text-muted mb-4">No drink configuration found</p>
-          <Link href="/builder">
-            <Button className="bg-brand-primary hover:bg-brand-primary-hover text-foreground">Start Building</Button>
+          <p className="text-brand-text-muted mb-4">Unable to generate recommendation</p>
+          <Link href="/admin">
+            <Button className="bg-brand-primary hover:bg-brand-primary-hover text-foreground">Go to Admin</Button>
           </Link>
         </div>
       </div>
@@ -137,14 +176,34 @@ Ice: ${drinkConfig.ice}`
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-page-background to-page-background-secondary">
-      {/* Main Content */}
-      <div className="container mx-auto px-4 py-12">
+    <div className="min-h-screen bg-gradient-to-b from-page-background to-page-background-secondary py-12">
+      <div className="container mx-auto px-4">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-8">
-            <h2 className="text-4xl font-bold text-brand-text mb-3">Your Custom Creation</h2>
-            <p className="text-brand-text-muted">Here's your personalized drink recipe</p>
+            <div className="flex items-center justify-center gap-2 mb-3">
+              <Sparkles className="h-8 w-8 text-brand-primary" />
+              <h2 className="text-4xl font-bold text-brand-text">AI Crafted Coffee</h2>
+            </div>
+            <p className="text-brand-text-muted">Personalized just for you based on your preferences</p>
           </div>
+
+          {aiInsights && (
+            <Card className="mb-8 border-brand-primary/20 bg-brand-primary/5">
+              <CardContent className="p-6">
+                <div className="flex items-start gap-3">
+                  <Sparkles className="h-5 w-5 text-brand-primary mt-1 flex-shrink-0" />
+                  <div>
+                    <p className="text-brand-text font-semibold mb-2">AI Insights</p>
+                    <p className="text-brand-text-muted text-sm">{aiInsights.reasoning}</p>
+                    <div className="flex gap-4 mt-3 text-xs text-brand-text-muted">
+                      <span>Base Match: {(aiInsights.baseScore * 100).toFixed(0)}%</span>
+                      <span>Milk Match: {(aiInsights.milkScore * 100).toFixed(0)}%</span>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Drink Image */}
@@ -164,26 +223,46 @@ Ice: ${drinkConfig.ice}`
                   )}
                 </div>
                 <h3 className="text-2xl font-bold text-brand-text text-center mb-4">
-                  {drinkConfig.name || "My Custom Drink"}
+                  {drinkConfig.name || "AI Crafted Coffee"}
                 </h3>
-                <div className="grid grid-cols-2 gap-3">
+                {!imageUrl ? (
                   <Button
-                    variant="outline"
-                    onClick={handleDownload}
-                    className="border-border text-brand-text-muted bg-transparent"
+                    onClick={handleGeneratePreview}
+                    disabled={isGeneratingImage}
+                    className="w-full bg-brand-primary hover:bg-brand-primary-hover text-foreground"
                   >
-                    <Download className="mr-2 h-4 w-4" />
-                    Download
+                    {isGeneratingImage ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Generating...
+                      </>
+                    ) : (
+                      <>
+                        <Sparkles className="mr-2 h-4 w-4" />
+                        Generate Preview
+                      </>
+                    )}
                   </Button>
-                  <Button
-                    variant="outline"
-                    onClick={handleCopy}
-                    className="border-border text-brand-text-muted bg-transparent"
-                  >
-                    {copied ? <Check className="mr-2 h-4 w-4" /> : <Copy className="mr-2 h-4 w-4" />}
-                    {copied ? "Copied!" : "Copy"}
-                  </Button>
-                </div>
+                ) : (
+                  <div className="grid grid-cols-2 gap-3">
+                    <Button
+                      variant="outline"
+                      onClick={handleDownload}
+                      className="border-border text-brand-text-muted bg-transparent"
+                    >
+                      <Download className="mr-2 h-4 w-4" />
+                      Download
+                    </Button>
+                    <Button
+                      variant="outline"
+                      onClick={handleCopy}
+                      className="border-border text-brand-text-muted bg-transparent"
+                    >
+                      {copied ? <Check className="mr-2 h-4 w-4" /> : <Copy className="mr-2 h-4 w-4" />}
+                      {copied ? "Copied!" : "Copy"}
+                    </Button>
+                  </div>
+                )}
               </CardContent>
             </Card>
 
@@ -384,16 +463,16 @@ Ice: ${drinkConfig.ice}`
                   )}
                 </Button>
                 <Button
-                  onClick={handleRestart}
+                  onClick={handleRegenerate}
                   variant="outline"
                   className="w-full border-border text-brand-text-muted bg-transparent"
                 >
                   <RotateCcw className="mr-2 h-4 w-4" />
-                  Create Another Drink
+                  Generate New Recommendation
                 </Button>
-                <Link href="/favorites" className="block">
+                <Link href="/builder" className="block">
                   <Button variant="ghost" className="w-full text-brand-text-muted hover:bg-muted">
-                    View All Favorites
+                    Customize Manually
                   </Button>
                 </Link>
               </div>

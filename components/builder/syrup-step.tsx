@@ -4,7 +4,7 @@ import { useEffect, useState } from "react"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Plus, Minus, X } from "lucide-react"
+import { Plus, Minus, X, Check } from "lucide-react"
 import type { DrinkConfig } from "@/app/builder/page"
 
 type Syrup = {
@@ -64,30 +64,30 @@ export function SyrupStep({
 
   return (
     <div className="space-y-6">
-      <p className="text-foreground">Add flavor syrups to your drink (optional)</p>
+      <p className="text-white">Add flavor syrups to your drink (optional)</p>
 
       {config.syrups.length > 0 && (
         <div className="space-y-3 p-4 bg-button-primary rounded-lg border-[3px] border-button-border">
-          <h4 className="font-semibold text-primary-foreground">Selected Syrups</h4>
+          <h4 className="font-semibold text-white">Selected Syrups</h4>
           {config.syrups.map((syrup) => (
-            <div key={syrup.name} className="flex items-center justify-between bg-foreground p-3 rounded-md">
-              <span className="text-brand-text font-medium">{syrup.name}</span>
+            <div key={syrup.name} className="flex items-center justify-between bg-starbucks-dark-green p-3 rounded-md">
+              <span className="text-white font-medium">{syrup.name}</span>
               <div className="flex items-center gap-3">
                 <div className="flex items-center gap-2">
                   <Button
                     size="sm"
                     variant="outline"
                     onClick={() => updatePumps(syrup.name, -1)}
-                    className="h-8 w-8 p-0"
+                    className="h-8 w-8 p-0 bg-white/10 border-white/20 text-white hover:bg-white/20"
                   >
                     <Minus className="h-4 w-4" />
                   </Button>
-                  <span className="text-brand-text w-12 text-center">{syrup.pumps} pumps</span>
+                  <span className="text-white w-12 text-center">{syrup.pumps} pumps</span>
                   <Button
                     size="sm"
                     variant="outline"
                     onClick={() => updatePumps(syrup.name, 1)}
-                    className="h-8 w-8 p-0"
+                    className="h-8 w-8 p-0 bg-white/10 border-white/20 text-white hover:bg-white/20"
                   >
                     <Plus className="h-4 w-4" />
                   </Button>
@@ -96,7 +96,7 @@ export function SyrupStep({
                   size="sm"
                   variant="ghost"
                   onClick={() => removeSyrup(syrup.name)}
-                  className="h-8 w-8 p-0 text-destructive hover:text-destructive/80"
+                  className="h-8 w-8 p-0 text-red-400 hover:text-red-300 hover:bg-red-500/20"
                 >
                   <X className="h-4 w-4" />
                 </Button>
@@ -112,20 +112,22 @@ export function SyrupStep({
           return (
             <Card
               key={syrup.id}
-              className={`p-4 cursor-pointer transition-all hover:shadow-md bg-button-primary ${
+              className={`p-4 cursor-pointer transition-all hover:shadow-md bg-button-primary relative ${
                 isSelected
                   ? "border-[3px] border-button-border"
                   : "border border-button-primary hover:border-button-border"
               }`}
               onClick={() => !isSelected && addSyrup(syrup.name)}
             >
+              {isSelected && (
+                <div className="absolute top-2 right-2 bg-white rounded-full p-1">
+                  <Check className="h-3 w-3 text-button-primary" />
+                </div>
+              )}
               <div className="flex flex-col gap-2">
-                <h3 className="font-semibold text-sm text-primary-foreground">{syrup.name}</h3>
+                <h3 className="font-semibold text-sm text-white">{syrup.name}</h3>
                 {syrup.is_seasonal && (
-                  <Badge
-                    variant="secondary"
-                    className="bg-seasonal/20 text-seasonal-foreground border-seasonal text-xs w-fit"
-                  >
+                  <Badge variant="secondary" className="bg-amber-500/20 text-amber-200 border-amber-400 text-xs w-fit">
                     Seasonal
                   </Badge>
                 )}

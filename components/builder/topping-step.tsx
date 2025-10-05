@@ -54,7 +54,7 @@ export function ToppingStep({
 
   return (
     <div className="space-y-4">
-      <p className="text-foreground mb-6">Select toppings for your drink (optional)</p>
+      <p className="text-white mb-6">Select toppings for your drink (optional)</p>
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
         {toppings.map((topping) => {
           const isSelected = config.toppings.includes(topping.name)

@@ -178,7 +178,15 @@ export async function compositeLogoOnImage(sourceImageUrl: string): Promise<stri
   }
 }
 
-export function buildDrinkPrompt(config: any): { prompt: string; negativePrompt: string } {
+export function buildDrinkPrompt(
+  config: any,
+  allProducts?: {
+    bases?: string[]
+    milks?: string[]
+    syrups?: string[]
+    toppings?: string[]
+  },
+): { prompt: string; negativePrompt: string } {
   const parts = []
   const excludeParts = []
 
@@ -193,79 +201,150 @@ export function buildDrinkPrompt(config: any): { prompt: string; negativePrompt:
 
   const hasIce = isCold && config.ice && config.ice.toLowerCase() !== "none" && config.ice.toLowerCase() !== ""
 
-  if (config.base) {
-    if (hasAdditions) {
-      parts.push(
-        `A professional photograph of a Starbucks ${config.temperature?.toLowerCase() || "hot"} drink with plain black ${config.base.toLowerCase()} as the base`,
-      )
-    } else {
-      parts.push(
-        `A professional photograph of a Starbucks ${config.temperature?.toLowerCase() || "hot"} black ${config.base.toLowerCase()} drink`,
-      )
-    }
-  }
-
   if (config.size) {
     const sizeLower = config.size.toLowerCase()
     let cupDescription = ""
 
     switch (sizeLower) {
       case "short":
-        cupDescription = "short cup (8 oz, 8.9 cm height, 6.4 cm diameter)"
+        cupDescription = isHot
+          ? "short white paper cup with brown cardboard sleeve (8 oz, 8.9 cm height, 6.4 cm diameter)"
+          : "short clear plastic cup (8 oz, 8.9 cm height, 6.4 cm diameter)"
         break
       case "tall":
-        cupDescription = "tall cup (12 oz, 11.4 cm height, 8.4 cm diameter)"
+        cupDescription = isHot
+          ? "tall white paper cup with brown cardboard sleeve (12 oz, 11.4 cm height, 8.4 cm diameter)"
+          : "tall clear plastic cup (12 oz, 11.4 cm height, 8.4 cm diameter)"
         break
       case "grande":
-        cupDescription = "grande cup (16 oz, 16 cm height, 9.2 cm diameter)"
+        cupDescription = isHot
+          ? "grande white paper cup with brown cardboard sleeve (16 oz, 16 cm height, 9.2 cm diameter)"
+          : "grande clear plastic cup (16 oz, 16 cm height, 9.2 cm diameter)"
         break
       case "venti":
         if (isCold) {
-          cupDescription = "venti cold cup (24 oz, 18 cm height, 10 cm diameter)"
+          cupDescription = "venti clear plastic cold cup (24 oz, 18 cm height, 10 cm diameter)"
         } else {
-          cupDescription = "venti hot cup (20 oz, 20 cm height, 9.2 cm diameter)"
+          cupDescription =
+            "venti white paper hot cup with brown cardboard sleeve (20 oz, 20 cm height, 9.2 cm diameter)"
         }
         break
       case "trenta":
-        cupDescription = "trenta cold cup (31 oz, 20.3 cm height, 10.4 cm diameter)"
+        cupDescription = "trenta clear plastic cold cup (31 oz, 20.3 cm height, 10.4 cm diameter)"
         break
       default:
-        cupDescription = `${sizeLower} cup`
+        cupDescription = isHot
+          ? `${sizeLower} white paper cup with brown cardboard sleeve`
+          : `${sizeLower} clear plastic cup`
     }
 
-    parts.push(
-      `in a completely transparent clear plastic ${cupDescription} with smooth surface and the Starbucks logo, crystal clear see-through cup showing the drink's beautiful layers and rich colors`,
-    )
+    if (isHot) {
+      parts.push(
+        `A professional photograph of a steaming hot Starbucks beverage in a ${cupDescription}, with visible steam rising from the top, the Starbucks logo on the cup`,
+      )
+    } else {
+      parts.push(
+        `A professional photograph of a cold Starbucks beverage in a completely transparent ${cupDescription} with smooth surface and the Starbucks logo, crystal clear see-through cup showing the drink's beautiful layers and rich colors`,
+      )
+    }
   } else {
-    parts.push(
-      `in a completely transparent clear plastic cup with smooth surface and the Starbucks logo, crystal clear see-through cup showing the drink's beautiful layers and rich colors`,
-    )
+    if (isHot) {
+      parts.push(
+        `A professional photograph of a steaming hot Starbucks beverage in a white paper cup with brown cardboard sleeve, with visible steam rising from the top, the Starbucks logo on the cup`,
+      )
+    } else {
+      parts.push(
+        `A professional photograph of a cold Starbucks beverage in a completely transparent clear plastic cup with smooth surface and the Starbucks logo, crystal clear see-through cup showing the drink's beautiful layers and rich colors`,
+      )
+    }
+  }
+
+  if (config.base) {
+    if (hasAdditions) {
+      parts.push(`with plain black ${config.base.toLowerCase()} as the base`)
+    } else {
+      parts.push(`black ${config.base.toLowerCase()} drink`)
+    }
+
+    if (allProducts?.bases) {
+      const unselectedBases = allProducts.bases
+        .filter((base) => base.toLowerCase() !== config.base.toLowerCase())
+        .slice(0, 3)
+      excludeParts.push(...unselectedBases.map((b) => b.toLowerCase()))
+    }
   }
 
   if (config.milk) {
     parts.push(`layered with ${config.milk.toLowerCase()}`)
+
+    if (allProducts?.milks) {
+      const unselectedMilks = allProducts.milks
+        .filter((milk) => milk.toLowerCase() !== config.milk.toLowerCase())
+        .slice(0, 3)
+      excludeParts.push(...unselectedMilks.map((m) => m.toLowerCase()))
+    }
   } else {
-    excludeParts.push("milk", "cream", "dairy", "white layer", "foam", "froth", "steamed milk", "milk foam")
+    excludeParts.push("milk", "cream", "dairy")
   }
 
   if (config.syrups && config.syrups.length > 0) {
     const syrupNames = config.syrups.map((s: any) => s.name.toLowerCase()).join(" and ")
     parts.push(`flavored with ${syrupNames} syrup`)
+
+    if (allProducts?.syrups) {
+      const selectedSyrupNames = config.syrups.map((s: any) => s.name.toLowerCase())
+      const unselectedSyrups = allProducts.syrups
+        .filter((syrup) => !selectedSyrupNames.includes(syrup.toLowerCase()))
+        .slice(0, 5)
+      excludeParts.push(...unselectedSyrups.map((s) => s.toLowerCase()))
+    }
   } else {
-    excludeParts.push("syrup", "flavoring", "sweetener")
+    excludeParts.push("syrup", "flavoring")
   }
 
   if (config.toppings && config.toppings.length > 0) {
     const toppingNames = config.toppings.map((t: string) => t.toLowerCase()).join(" and ")
     parts.push(`topped with ${toppingNames}`)
+
+    if (allProducts?.toppings) {
+      const selectedToppingNames = config.toppings.map((t: string) => t.toLowerCase())
+      const unselectedToppings = allProducts.toppings
+        .filter((topping) => !selectedToppingNames.includes(topping.toLowerCase()))
+        .slice(0, 5)
+      excludeParts.push(...unselectedToppings.map((t) => t.toLowerCase()))
+    }
   } else {
-    excludeParts.push("whipped cream", "toppings", "drizzle", "caramel drizzle", "chocolate drizzle")
+    excludeParts.push("whipped cream", "toppings")
   }
 
   if (hasIce) {
     parts.push(`with ice cubes`)
   } else {
-    excludeParts.push("ice cubes", "ice", "frozen", "icy")
+    excludeParts.push("ice cubes", "ice", "frozen", "iced drink", "cold drink")
+  }
+
+  if (isHot) {
+    excludeParts.push(
+      "transparent cup",
+      "clear plastic cup",
+      "plastic cup",
+      "iced",
+      "cold",
+      "ice cubes",
+      "ice",
+      "see-through cup",
+      "clear cup",
+      "plastic",
+      "transparent",
+      "iced drink",
+      "cold beverage",
+      "frozen",
+    )
+  }
+
+  // Explicit exclusions for cold drinks
+  if (isCold) {
+    excludeParts.push("paper cup", "cardboard sleeve", "steam", "steaming", "hot beverage", "hot drink")
   }
 
   if (config.espresso && config.espresso > 0) {
@@ -273,31 +352,19 @@ export function buildDrinkPrompt(config: any): { prompt: string; negativePrompt:
   }
 
   parts.push(
-    "side view, close-up product shot filling the entire frame, clean white background, bright studio lighting, high quality, appetizing, professional beverage photography, edge-to-edge composition, no extra space around cup",
+    "side view, close-up product shot filling the entire frame, clean white background, bright studio lighting, high quality, appetizing, professional beverage photography",
   )
 
-  // These were preventing proper logo compositing and background generation
-  excludeParts.push(
-    "paper cup",
-    "cardboard sleeve",
-    "opaque cup",
-    "shadows",
-    "frame",
-    "border",
-    "white frame",
-    "extra space",
-    "padding",
-    "margin",
-    "white space around cup",
-    "centered with space",
-    "top view",
-    "bottom view",
-    "overhead view",
-    "bird's eye view",
-  )
+  excludeParts.push("opaque cup", "shadows", "top view", "overhead view")
+
+  let negativePrompt = excludeParts.join(", ")
+  if (negativePrompt.length > 1000) {
+    // Truncate to fit within limit
+    negativePrompt = negativePrompt.substring(0, 997) + "..."
+  }
 
   return {
     prompt: parts.join(", "),
-    negativePrompt: excludeParts.join(", "),
+    negativePrompt,
   }
 }

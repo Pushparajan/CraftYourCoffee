@@ -5,8 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
-import { Loader2, Sparkles, ArrowLeft } from "lucide-react"
-import Link from "next/link"
+import { Loader2, Sparkles } from "lucide-react"
 
 export default function CustomPromptPage() {
   const [prompt, setPrompt] = useState("")
@@ -53,22 +52,6 @@ export default function CustomPromptPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-page-background to-page-background-secondary">
-      {/* Header */}
-      <header className="border-b bg-foreground/80 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2">
-            <img src="/logo.png" alt="CraftYourCoffee Logo" className="h-8 w-8" />
-            <h1 className="text-2xl font-bold text-brand-text">CraftYourCoffee</h1>
-          </Link>
-          <Link href="/builder">
-            <Button variant="outline" className="border-border text-brand-text-muted bg-transparent">
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Back to Builder
-            </Button>
-          </Link>
-        </div>
-      </header>
-
       {/* Main Content */}
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-6xl mx-auto">

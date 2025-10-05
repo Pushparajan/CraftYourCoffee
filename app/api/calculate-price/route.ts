@@ -102,8 +102,12 @@ export async function POST(request: NextRequest) {
       milk: Math.floor(milkPrice * 2),
       syrups: Math.floor(syrupsPrice * 2),
       toppings: Math.floor(toppingsPrice * 2),
-      total: Math.floor(total * 2),
+      total: 0, // Will be calculated below
     }
+
+    // Calculate total as sum of individual points to avoid rounding errors
+    loyaltyPoints.total =
+      loyaltyPoints.base + loyaltyPoints.size + loyaltyPoints.milk + loyaltyPoints.syrups + loyaltyPoints.toppings
 
     return NextResponse.json({
       base: basePrice,

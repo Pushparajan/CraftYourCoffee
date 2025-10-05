@@ -75,10 +75,10 @@
   --brand-text-muted: oklch(0.45 0.01 60);
 
   /* Button colors - Starbucks uses outlined buttons for secondary actions */
-  --button-primary: var(--starbucks-black);
-  --button-primary-hover: oklch(0.25 0 0);
+  --button-primary: var(--starbucks-green);
+  --button-primary-hover: var(--starbucks-dark-green);
   --button-secondary: transparent;
-  --button-border: var(--starbucks-black);
+  --button-border: var(--starbucks-green);
 
   /* Selection colors for drink builder */
   --selection-bg: oklch(0.85 0.02 45);

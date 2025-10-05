@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
 import { ArrowLeft, ArrowRight, Loader2 } from "lucide-react"
-import Link from "next/link"
 import { BaseStep } from "@/components/builder/base-step"
 import { SizeStep } from "@/components/builder/size-step"
 import { MilkStep } from "@/components/builder/milk-step"
@@ -105,24 +104,6 @@ export default function BuilderPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-page-background to-page-background-secondary">
-      {/* Header */}
-      <header className="border-b bg-foreground/80 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2">
-            <img src="/logo.png" alt="CraftYourCoffee Logo" className="h-8 w-8" />
-            <h1 className="text-2xl font-bold text-brand-text">CraftYourCoffee</h1>
-          </Link>
-          <div className="flex items-center gap-6">
-            <Link href="/custom-prompt" className="text-sm font-semibold text-brand-text hover:text-brand-primary">
-              Test Prompts
-            </Link>
-            <div className="text-sm text-brand-text-muted">
-              Step {currentStep} of {steps.length}
-            </div>
-          </div>
-        </div>
-      </header>
-
       {/* Progress Bar */}
       <div className="container mx-auto px-4 py-4">
         <Progress value={progress} className="h-2" />

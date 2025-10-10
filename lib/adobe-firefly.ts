@@ -116,7 +116,7 @@ export async function compositeLogoOnImage(sourceImageUrl: string): Promise<stri
     const accessToken = await getAccessToken()
 
     const requestBody = {
-      prompt: "Place the Starbucks logo on the center of the transparent cup, visible and prominent on the cup surface",
+      prompt: "Emboss the Starbucks logo on the center of the cup surface with a raised 3D effect, making it appear naturally integrated and prominent on the cup",
       image: {
         source: {
           url: sourceImageUrl,
